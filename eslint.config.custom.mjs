@@ -122,7 +122,7 @@ export const customOverrideEslintRule = [
     },
   },
   {
-    files: ['**/*.spec.ts', '**/*.spec.tsx'],
+    files: ['**/*.test.ts', '**/*.test.tsx'],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       'import-x/no-extraneous-dependencies': 'off',
