@@ -4,6 +4,13 @@ import type { OpenAPIV3 } from 'openapi-types';
 import { createFrame } from '#/modules/generators/createFrame';
 import { Project } from 'ts-morph';
 
+export interface IProps {
+  specTypeFilePath: string;
+  host: string;
+  outputFilePath: string;
+  useCodeFence: boolean;
+}
+
 export async function createFrames(_document: OpenAPIV3.Document): Promise<
   {
     method: THttpMethod;
@@ -27,7 +34,7 @@ export async function createFrames(_document: OpenAPIV3.Document): Promise<
             operation == null
               ? undefined
               : createFrame(project, {
-                  typeFilePath: '',
+                  specTypeFilePath: '',
                   host: '',
                   pathKey,
                   method,

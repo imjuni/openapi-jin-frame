@@ -19,6 +19,6 @@ describe('getFrameName', () => {
       pathKey: '/pet/findByTags',
     });
 
-    expect(result).toEqual('PostPetFindByTags');
+    expect(result).toEqual('PostPetFindByTagsFrame');
   });
 });

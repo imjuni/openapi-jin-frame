@@ -3,9 +3,10 @@ import { preferredContentTypes } from '#/modules/generators/content-type/preferr
 import type { OpenAPIV3 } from 'openapi-types';
 
 export function getRequestContentType(
-  operation: Pick<OpenAPIV3.OperationObject, 'requestBody'>,
+  _requestBody?: OpenAPIV3.ReferenceObject | OpenAPIV3.RequestBodyObject,
 ): string | undefined {
-  const content = (operation?.requestBody as OpenAPIV3.RequestBodyObject | undefined)?.content;
+  const requestBody = _requestBody as OpenAPIV3.RequestBodyObject | undefined;
+  const content = requestBody?.content;
 
   if (content == null) {
     return undefined;

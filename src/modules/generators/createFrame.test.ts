@@ -1,7 +1,12 @@
 import { createFrame } from '#/modules/generators/createFrame';
 import type { OpenAPIV3 } from 'openapi-types';
 import { Project } from 'ts-morph';
-import { describe, expect, it } from 'vitest';
+import { randomUUID } from 'node:crypto';
+import { beforeEach, describe, expect, it, vitest } from 'vitest';
+
+vitest.mock('node:crypto', () => ({
+  randomUUID: vitest.fn(),
+}));
 
 describe('createFrame', () => {
   const project = new Project();
@@ -31,27 +36,15 @@ describe('createFrame', () => {
             example: 'Dogs',
           },
         },
-        xml: {
-          name: 'category',
-        },
       },
       photoUrls: {
         type: 'array',
-        xml: {
-          wrapped: true,
-        },
         items: {
           type: 'string',
-          xml: {
-            name: 'photoUrl',
-          },
         },
       },
       tags: {
         type: 'array',
-        xml: {
-          wrapped: true,
-        },
         items: {
           type: 'object',
           properties: {
@@ -63,9 +56,6 @@ describe('createFrame', () => {
               type: 'string',
             },
           },
-          xml: {
-            name: 'tag',
-          },
         },
       },
       status: {
@@ -74,14 +64,41 @@ describe('createFrame', () => {
         enum: ['available', 'pending', 'sold'],
       },
     },
-    xml: {
-      name: 'pet',
-    },
   };
+  const parameters = [
+    {
+      name: 'status',
+      in: 'query',
+      description: 'Status values that need to be considered for filter',
+      required: true,
+      explode: true,
+      example: 'ironman',
+      schema: {
+        type: 'string',
+        default: 'available',
+        enum: ['available', 'pending', 'sold'],
+      },
+    },
+    {
+      name: 'name',
+      in: 'query',
+      description: 'Name of pet that needs to be updated',
+      schema: {
+        type: 'string',
+      },
+    },
+  ];
+
+  beforeEach(() => {
+    vitest.clearAllMocks();
+  });
 
   it('should return full frame when pass param with requestBody', () => {
+    const mockUuid = 'mockuuid-fe32-4d5d-923e-68fc16766231';
+    vitest.mocked(randomUUID).mockReturnValue(mockUuid);
+
     const frame = createFrame(project, {
-      typeFilePath: 'petstore.d.ts',
+      specTypeFilePath: 'petstore.d.ts',
       host: 'https://pokeapi.co',
       pathKey: '/pet/findByStatus/{status}',
       method: 'GET',
@@ -92,35 +109,13 @@ describe('createFrame', () => {
         requestBody: {
           description: 'Update an existent pet in the store',
           content: {
-            'application/json': operationRequestBody,
-            'application/xml': operationRequestBody,
-            'application/x-www-form-urlencoded': operationRequestBody,
+            'application/json': { schema: operationRequestBody },
+            'application/xml': { schema: operationRequestBody },
+            'application/x-www-form-urlencoded': { schema: operationRequestBody },
           },
           required: true,
         },
-        parameters: [
-          {
-            name: 'status',
-            in: 'query',
-            description: 'Status values that need to be considered for filter',
-            required: true,
-            explode: true,
-            example: 'ironman',
-            schema: {
-              type: 'string',
-              default: 'available',
-              enum: ['available', 'pending', 'sold'],
-            },
-          },
-          {
-            name: 'name',
-            in: 'query',
-            description: 'Name of pet that needs to be updated',
-            schema: {
-              type: 'string',
-            },
-          },
-        ],
+        parameters,
         tags: ['pet', 'cat'],
         responses: {
           '200': {
@@ -140,34 +135,125 @@ describe('createFrame', () => {
       } as OpenAPIV3.OperationObject,
     });
 
-    expect(frame).toMatchObject({
+    const source = `import { Get, Query, ObjectBody, JinFrame } from "jin-frame";
+/**
+ * Finds Pets by tags.
+ * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+ *
+ * @see GET /pet/findByStatus/{status}
+ * @tag pet, cat
+ */
+@Get({ host: 'https://pokeapi.co', path: '/pet/findByStatus/:status' })
+export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findByStatus/{status}']['get']['responses']['200']['content']['application/json']> {
+    /**
+     * Status values that need to be considered for filter
+     *
+     * @example ironman
+     */
+    @Query({ comma: true })
+    declare public readonly status?: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['status'];
+    /** Name of pet that needs to be updated */
+    @Query()
+    declare public readonly name: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['name'];
+    /** Update an existent pet in the store */
+    @ObjectBody()
+    declare public readonly body?: paths['/pet/findByStatus/{status}']['get']['requestBody']['content']['application/json'];
+}
+`;
+
+    expect(frame).toEqual({
+      aliasFilePath: `${mockUuid}-${mockUuid}.ts`,
       filePath: 'GetPetFindByStatusStatusFrame.ts',
       tag: 'pet',
-      source:
-        'import { Get, Query, ObjectBody, JinFrame } from "jin-frame";\n' +
-        '/**\n' +
-        ' * Finds Pets by tags.\n' +
-        ' * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.\n' +
-        ' *\n' +
-        ' * @see GET /pet/findByStatus/{status}\n' +
-        ' * @tag pet, cat\n' +
-        ' */\n' +
-        "@Get({ host: 'https://pokeapi.co', path: '/pet/findByStatus/:status' })\n" +
-        "export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findByStatus/{status}']['get']['responses']['200']['content']['application/json']> {\n" +
-        '    /**\n' +
-        '     * Status values that need to be considered for filter\n' +
-        '     *\n' +
-        '     * @example ironman\n' +
-        '     */\n' +
-        '    @Query({ comma: true })\n' +
-        "    declare public readonly status?: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['status'];\n" +
-        '    /** Name of pet that needs to be updated */\n' +
-        '    @Query()\n' +
-        "    declare public readonly name: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['name'];\n" +
-        '    /** Update an existent pet in the store */\n' +
-        '    @ObjectBody()\n' +
-        "    declare public readonly body?: paths['/pet/findByStatus/{status}']['get']['requestBody']['content']['application/json'];\n" +
-        '}\n',
+      source,
+    });
+  });
+
+  it('should return full frame when pass param with requestBody', () => {
+    const mockUuid = 'mockuuid-fe32-4d5d-923e-1234567890123';
+    vitest.mocked(randomUUID).mockReturnValue(mockUuid);
+
+    const testOperationRequestBody = structuredClone(operationRequestBody);
+    testOperationRequestBody.properties.photoUrls = {
+      ...testOperationRequestBody.properties.photoUrls,
+      type: 'array',
+      items: {
+        type: 'string',
+        format: 'binary',
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+
+    const frame = createFrame(project, {
+      specTypeFilePath: 'petstore.d.ts',
+      host: 'https://pokeapi.co',
+      pathKey: '/pet/findByStatus/{status}',
+      method: 'GET',
+      operation: {
+        description:
+          'Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.',
+        summary: 'Finds Pets by tags.',
+        requestBody: {
+          description: 'Update an existent pet in the store',
+          content: {
+            'multipart/form-data': { schema: testOperationRequestBody },
+          },
+          required: true,
+        },
+        parameters,
+        tags: ['pet', 'cat'],
+        responses: {
+          '200': {
+            description: 'successful operation',
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/Order',
+                },
+              },
+            },
+          },
+          '400': {
+            description: 'Invalid input',
+          },
+        },
+      } as OpenAPIV3.OperationObject,
+    });
+
+    const source = `import { Get, Query, ObjectBody, Body, JinFrame } from "jin-frame";
+/**
+ * Finds Pets by tags.
+ * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
+ *
+ * @see GET /pet/findByStatus/{status}
+ * @tag pet, cat
+ */
+@Get({ host: 'https://pokeapi.co', path: '/pet/findByStatus/:status', contentType: 'multipart/form-data' })
+export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findByStatus/{status}']['get']['responses']['200']['content']['application/json']> {
+    /**
+     * Status values that need to be considered for filter
+     *
+     * @example ironman
+     */
+    @Query({ comma: true })
+    declare public readonly status?: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['status'];
+    /** Name of pet that needs to be updated */
+    @Query()
+    declare public readonly name: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['name'];
+    /** Update an existent pet in the store */
+    @ObjectBody()
+    declare public readonly body?: Omit<paths['/pet/findByStatus/{status}']['get']['requestBody']['content']['multipart/form-data'], 'photoUrls'>;
+    /** Update an existent pet in the store */
+    @Body()
+    declare public readonly photoUrls?: JinFile[];
+}
+`;
+
+    expect(frame).toEqual({
+      aliasFilePath: `${mockUuid}-${mockUuid}.ts`,
+      filePath: 'GetPetFindByStatusStatusFrame.ts',
+      tag: 'pet',
+      source,
     });
   });
 });

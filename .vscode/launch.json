@@ -5,15 +5,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Jest",
-      "request": "launch",
-      "runtimeArgs": ["run-script", "test:debug", "${input:testPath}"],
-      "runtimeExecutable": "npm",
-      "skipFiles": ["<node_internals>/**"],
-      "stopOnEntry": true,
-      "type": "node"
-    },
-    {
       "type": "node",
       "request": "launch",
       "name": "Launch Test",

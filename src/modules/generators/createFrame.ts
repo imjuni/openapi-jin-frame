@@ -8,12 +8,12 @@ import type { OpenAPIV3 } from 'openapi-types';
 import { getParameter } from '#/modules/generators/parameters/getParameter';
 import { getRequestContentType } from '#/modules/generators/content-type/getRequestContentType';
 import { getResponseContentType } from '#/modules/generators/content-type/getResponseContentType';
-import { getObjectBodyParameter } from '#/modules/generators/parameters/getObjectBodyParameter';
+import { getBodyParameter } from '#/modules/generators/parameters/getBodyParameter';
 import { randomUUID } from 'node:crypto';
 import { getMethodDecorator } from '#/modules/generators/content-type/getMethodDecorator';
 
 interface IProps {
-  typeFilePath: string;
+  specTypeFilePath: string;
   host: string;
   pathKey: string;
   operation: OpenAPIV3.OperationObject;
@@ -36,8 +36,8 @@ export function createFrame(project: Project, params: IProps): IResult {
   const method = pascalCase(originMethod.toLowerCase());
   const description = getClassJsDoc(params);
   const pathToRegex = swaggerPathToPathToRegexp(params.pathKey);
-  const requestContentType = getRequestContentType(params.operation);
-  const responseContentType = getResponseContentType(params.operation);
+  const requestContentType = getRequestContentType(params.operation.requestBody);
+  const responseContentType = getResponseContentType(params.operation.responses);
   const methodDecorator = getMethodDecorator({
     host: params.host,
     path: pathToRegex,
@@ -58,27 +58,25 @@ export function createFrame(project: Project, params: IProps): IResult {
       .filter((parameter) => parameter != null) ?? [];
   const properties = parameters?.map((parameter) => parameter.property);
 
-  const objectBody = getObjectBodyParameter({
+  const bodies = getBodyParameter({
     method: originMethod,
     pathKey: params.pathKey,
     contentType: requestContentType,
     requestBody: params.operation.requestBody,
   });
 
-  if (objectBody != null) {
-    properties.push(objectBody);
+  if (bodies != null) {
+    properties.push(...bodies.map((body) => body.property));
   }
 
-  const paramDecorators = [
+  const bodyNamedImports = [
     ...parameters.map((parameter) => parameter.decorator),
-    objectBody == null ? undefined : 'ObjectBody',
-  ]
-    .filter((decorator) => decorator != null)
-    .flat();
+    ...bodies.map((body) => body.decorator),
+  ];
 
   sourceFile.addImportDeclaration({
     moduleSpecifier: 'jin-frame',
-    namedImports: [method, ...Array.from(new Set<string>(paramDecorators)), 'JinFrame'],
+    namedImports: [method, ...Array.from(new Set<string>(bodyNamedImports)), 'JinFrame'],
   });
 
   sourceFile.addClass({

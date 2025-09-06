@@ -3,10 +3,8 @@ import { preferredContentTypes } from '#/modules/generators/content-type/preferr
 import type { OpenAPIV3 } from 'openapi-types';
 
 export function getResponseContentType(
-  operation: Pick<OpenAPIV3.OperationObject, 'responses'>,
+  responses?: OpenAPIV3.ResponsesObject,
 ): { statusCode: string; mediaType: string } | undefined {
-  const responses = operation?.responses as OpenAPIV3.ResponsesObject | undefined;
-
   if (responses == null) {
     return undefined;
   }

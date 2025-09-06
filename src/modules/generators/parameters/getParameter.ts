@@ -9,12 +9,12 @@ interface IProps {
   parameter: OpenAPIV3.ParameterObject;
 }
 
-export function getParameter(params: IProps):
-  | {
-      decorator: 'Query' | 'Param' | 'Header';
-      property: PropertyDeclarationStructure;
-    }
-  | undefined {
+interface IResult {
+  decorator: 'Query' | 'Param' | 'Header';
+  property: PropertyDeclarationStructure;
+}
+
+export function getParameter(params: IProps): IResult | undefined {
   const decorator = getParameterDecorator(params.parameter.in);
 
   if (decorator == null) {
@@ -22,18 +22,13 @@ export function getParameter(params: IProps):
   }
 
   const docs = getParameterJsDoc(params.parameter);
-  const decorators: PropertyDeclarationStructure['decorators'] =
-    decorator != null
-      ? [
-          {
-            name: decorator.decorator,
-            arguments:
-              decorator.decorator === 'Query' && params.parameter.explode
-                ? ['{ comma: true }']
-                : [],
-          },
-        ]
-      : [];
+  const decorators: PropertyDeclarationStructure['decorators'] = [
+    {
+      name: decorator.decorator,
+      arguments:
+        decorator.decorator === 'Query' && params.parameter.explode ? ['{ comma: true }'] : [],
+    },
+  ];
 
   const property: PropertyDeclarationStructure = {
     decorators,
