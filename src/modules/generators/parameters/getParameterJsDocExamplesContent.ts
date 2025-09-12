@@ -1,4 +1,4 @@
-import { safeStringify } from '#/modules/json/safeStringify';
+import { safeStringify } from '#/modules/safe-tools/safeStringify';
 import type { OpenAPIV3 } from 'openapi-types';
 
 interface IProps {

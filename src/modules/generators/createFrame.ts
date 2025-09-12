@@ -11,9 +11,11 @@ import { getResponseContentType } from '#/modules/generators/content-type/getRes
 import { getBodyParameter } from '#/modules/generators/parameters/getBodyParameter';
 import { randomUUID } from 'node:crypto';
 import { getMethodDecorator } from '#/modules/generators/content-type/getMethodDecorator';
+import { dotRelative } from '#/modules/safe-tools/dotRelative';
 
 interface IProps {
   specTypeFilePath: string;
+  output: string;
   host: string;
   pathKey: string;
   operation: OpenAPIV3.OperationObject;
@@ -77,6 +79,10 @@ export function createFrame(project: Project, params: IProps): IResult {
   sourceFile.addImportDeclaration({
     moduleSpecifier: 'jin-frame',
     namedImports: [method, ...Array.from(new Set<string>(bodyNamedImports)), 'JinFrame'],
+  });
+  sourceFile.addImportDeclaration({
+    moduleSpecifier: dotRelative(params.output, params.specTypeFilePath),
+    namedImports: ['paths'],
   });
 
   sourceFile.addClass({

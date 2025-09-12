@@ -1,5 +1,5 @@
+import { safeParse } from '#/modules/safe-tools/safeParse';
 import { describe, expect, it } from 'vitest';
-import { safeParse } from './safeParse';
 
 describe('safeParse', () => {
   it('should return the parsed value', () => {

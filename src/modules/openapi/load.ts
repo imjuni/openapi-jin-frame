@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import { exists } from 'my-node-fp';
 import axios from 'axios';
-import { safeParse } from '#/modules/json/safeParse';
+import { multiParse } from '#/modules/safe-tools/multiParse';
 
 export async function load(filePath: string): Promise<unknown> {
   if (await exists(filePath)) {
     // load openapi spec from the file
     const buf = await fs.promises.readFile(filePath);
-    return safeParse(buf.toString());
+    return multiParse(buf.toString());
   }
 
   if (filePath.startsWith('http')) {

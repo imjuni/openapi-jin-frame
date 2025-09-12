@@ -7,18 +7,19 @@ import { Project } from 'ts-morph';
 export interface IProps {
   specTypeFilePath: string;
   host: string;
-  outputFilePath: string;
+  output: string;
   useCodeFence: boolean;
+  document: OpenAPIV3.Document;
 }
 
-export async function createFrames(_document: OpenAPIV3.Document): Promise<
+export async function createFrames(params: IProps): Promise<
   {
     method: THttpMethod;
     pathKey: string;
     frame: ReturnType<typeof createFrame>;
   }[]
 > {
-  const document = await $RefParser.dereference<OpenAPIV3.Document>(_document);
+  const document = await $RefParser.dereference<OpenAPIV3.Document>(params.document);
   const paths = document.paths ?? {};
   const project = new Project();
   const methods: THttpMethod[] = ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'];
@@ -34,8 +35,9 @@ export async function createFrames(_document: OpenAPIV3.Document): Promise<
             operation == null
               ? undefined
               : createFrame(project, {
-                  specTypeFilePath: '',
-                  host: '',
+                  specTypeFilePath: params.specTypeFilePath,
+                  output: params.output,
+                  host: params.host,
                   pathKey,
                   method,
                   operation,

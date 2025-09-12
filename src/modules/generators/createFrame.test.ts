@@ -98,8 +98,9 @@ describe('createFrame', () => {
     vitest.mocked(randomUUID).mockReturnValue(mockUuid);
 
     const frame = createFrame(project, {
-      specTypeFilePath: 'petstore.d.ts',
+      specTypeFilePath: '/a/b/petstore.d.ts',
       host: 'https://pokeapi.co',
+      output: '/a/b',
       pathKey: '/pet/findByStatus/{status}',
       method: 'GET',
       operation: {
@@ -136,6 +137,7 @@ describe('createFrame', () => {
     });
 
     const source = `import { Get, Query, ObjectBody, JinFrame } from "jin-frame";
+import { paths } from "./petstore.d.ts";
 /**
  * Finds Pets by tags.
  * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -181,12 +183,12 @@ export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findBySt
         type: 'string',
         format: 'binary',
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     const frame = createFrame(project, {
-      specTypeFilePath: 'petstore.d.ts',
+      specTypeFilePath: '/a/b/petstore.d.ts',
       host: 'https://pokeapi.co',
+      output: '/a/b',
       pathKey: '/pet/findByStatus/{status}',
       method: 'GET',
       operation: {
@@ -221,6 +223,7 @@ export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findBySt
     });
 
     const source = `import { Get, Query, ObjectBody, Body, JinFrame } from "jin-frame";
+import { paths } from "./petstore.d.ts";
 /**
  * Finds Pets by tags.
  * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
