@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import pathe from 'pathe';
 import { printOpenapiTs } from '#/modules/openapi-ts/printOpenapiTs';
 import { createFrames } from '#/modules/generators/createFrames';
+import { safePathJoin } from '#/modules/safe-tools/safePathJoin';
 
 export async function create(params: InferValue<typeof createCommand>): Promise<void> {
   consola.level = LogLevels[params.logLevel as LogType];
@@ -58,8 +59,10 @@ export async function create(params: InferValue<typeof createCommand>): Promise<
 
   await Promise.all(
     frames.map(async (frame) => {
-      const filePath = pathe.join(params.output, frame.frame.filePath);
+      const dirPath = safePathJoin(params.output, frame.frame.tag);
+      const filePath = pathe.join(dirPath, frame.frame.filePath);
       consola.debug(`Writing to ${filePath}`);
+      await fs.promises.mkdir(dirPath, { recursive: true });
       await fs.promises.writeFile(filePath, frame.frame.source);
     }),
   );

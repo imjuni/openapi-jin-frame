@@ -30,7 +30,7 @@ export function getBodyParameter(params: IProps): IResult[] {
   }
 
   const description = getParameterJsDoc(requestBody);
-  const pathsKey = `paths['${params.pathKey}']['${params.method}']['requestBody']['content']['${params.contentType}']`;
+  const pathsKey = `NonNullable<paths['${params.pathKey}']['${params.method}']['requestBody']>['content']['${params.contentType}']`;
 
   if (params.contentType === 'application/octet-stream') {
     const mediaType = requestBody?.content?.['application/octet-stream'];

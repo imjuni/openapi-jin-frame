@@ -12,6 +12,8 @@ import { getBodyParameter } from '#/modules/generators/parameters/getBodyParamet
 import { randomUUID } from 'node:crypto';
 import { getMethodDecorator } from '#/modules/generators/content-type/getMethodDecorator';
 import { dotRelative } from '#/modules/safe-tools/dotRelative';
+import { safePathJoin } from '#/modules/safe-tools/safePathJoin';
+import { removeExt } from '#/modules/safe-tools/removeExt';
 
 interface IProps {
   specTypeFilePath: string;
@@ -81,7 +83,10 @@ export function createFrame(project: Project, params: IProps): IResult {
     namedImports: [method, ...Array.from(new Set<string>(bodyNamedImports)), 'JinFrame'],
   });
   sourceFile.addImportDeclaration({
-    moduleSpecifier: dotRelative(params.output, params.specTypeFilePath),
+    moduleSpecifier: dotRelative(
+      safePathJoin(params.output, firstTag),
+      removeExt(params.specTypeFilePath),
+    ),
     namedImports: ['paths'],
   });
 

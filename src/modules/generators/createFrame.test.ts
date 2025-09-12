@@ -137,7 +137,7 @@ describe('createFrame', () => {
     });
 
     const source = `import { Get, Query, ObjectBody, JinFrame } from "jin-frame";
-import { paths } from "./petstore.d.ts";
+import { paths } from "../petstore";
 /**
  * Finds Pets by tags.
  * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -153,13 +153,13 @@ export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findBySt
      * @example ironman
      */
     @Query({ comma: true })
-    declare public readonly status?: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['status'];
+    declare public readonly status?: NonNullable<paths['/pet/findByStatus/{status}']['get']['parameters']['query']>['status'];
     /** Name of pet that needs to be updated */
     @Query()
-    declare public readonly name: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['name'];
+    declare public readonly name: NonNullable<paths['/pet/findByStatus/{status}']['get']['parameters']['query']>['name'];
     /** Update an existent pet in the store */
     @ObjectBody()
-    declare public readonly body?: paths['/pet/findByStatus/{status}']['get']['requestBody']['content']['application/json'];
+    declare public readonly body?: NonNullable<paths['/pet/findByStatus/{status}']['get']['requestBody']>['content']['application/json'];
 }
 `;
 
@@ -223,7 +223,7 @@ export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findBySt
     });
 
     const source = `import { Get, Query, ObjectBody, Body, JinFrame } from "jin-frame";
-import { paths } from "./petstore.d.ts";
+import { paths } from "../petstore";
 /**
  * Finds Pets by tags.
  * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -239,13 +239,13 @@ export class GetPetFindByStatusStatusFrame extends JinFrame<paths['/pet/findBySt
      * @example ironman
      */
     @Query({ comma: true })
-    declare public readonly status?: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['status'];
+    declare public readonly status?: NonNullable<paths['/pet/findByStatus/{status}']['get']['parameters']['query']>['status'];
     /** Name of pet that needs to be updated */
     @Query()
-    declare public readonly name: paths['/pet/findByStatus/{status}']['get']['parameters']['query']['name'];
+    declare public readonly name: NonNullable<paths['/pet/findByStatus/{status}']['get']['parameters']['query']>['name'];
     /** Update an existent pet in the store */
     @ObjectBody()
-    declare public readonly body?: Omit<paths['/pet/findByStatus/{status}']['get']['requestBody']['content']['multipart/form-data'], 'photoUrls'>;
+    declare public readonly body?: Omit<NonNullable<paths['/pet/findByStatus/{status}']['get']['requestBody']>['content']['multipart/form-data'], 'photoUrls'>;
     /** Update an existent pet in the store */
     @Body()
     declare public readonly photoUrls?: JinFile[];

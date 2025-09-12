@@ -34,7 +34,7 @@ export function getParameter(params: IProps): IResult | undefined {
     decorators,
     docs,
     name: params.parameter.name,
-    type: `paths['${params.pathKey}']['${params.method}']['parameters']['${decorator?.in}']['${params.parameter.name}']`,
+    type: `NonNullable<paths['${params.pathKey}']['${params.method}']['parameters']['${decorator?.in}']>['${params.parameter.name}']`,
     hasDeclareKeyword: true,
     isReadonly: true,
     hasQuestionToken: params.parameter.required ?? false,

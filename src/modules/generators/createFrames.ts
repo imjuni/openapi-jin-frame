@@ -3,6 +3,7 @@ import type { THttpMethod } from '#/https/method';
 import type { OpenAPIV3 } from 'openapi-types';
 import { createFrame } from '#/modules/generators/createFrame';
 import { Project } from 'ts-morph';
+import { createBaseFrame } from '#/modules/generators/createBaseFrame';
 
 export interface IProps {
   specTypeFilePath: string;
@@ -58,5 +59,7 @@ export async function createFrames(params: IProps): Promise<
     })
     .flat();
 
-  return frames;
+  const baseFrame = createBaseFrame(project, params);
+
+  return [{ frame: baseFrame, method: 'get', pathKey: '/' }, ...frames];
 }
