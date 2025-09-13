@@ -7,9 +7,11 @@ import { createBaseFrame } from '#/modules/generators/createBaseFrame';
 
 export interface IProps {
   specTypeFilePath: string;
+  baseFrame?: string;
   host: string;
   output: string;
   useCodeFence: boolean;
+  timeout?: number;
   document: OpenAPIV3.Document;
 }
 
@@ -25,6 +27,16 @@ export async function createFrames(params: IProps): Promise<
   const project = new Project();
   const methods: THttpMethod[] = ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'];
 
+  const baseFrame =
+    params.baseFrame != null
+      ? createBaseFrame(project, {
+          output: params.output,
+          host: params.host,
+          name: params.baseFrame,
+          timeout: params.timeout,
+        })
+      : undefined;
+
   const frames = Object.keys(paths)
     .map((pathKey) => {
       const apiPath = paths[pathKey];
@@ -39,6 +51,7 @@ export async function createFrames(params: IProps): Promise<
                   specTypeFilePath: params.specTypeFilePath,
                   output: params.output,
                   host: params.host,
+                  baseFrame: params.baseFrame,
                   pathKey,
                   method,
                   operation,
@@ -59,7 +72,9 @@ export async function createFrames(params: IProps): Promise<
     })
     .flat();
 
-  const baseFrame = createBaseFrame(project, params);
+  if (baseFrame != null) {
+    return [{ frame: baseFrame, method: 'get', pathKey: '/' }, ...frames];
+  }
 
-  return [{ frame: baseFrame, method: 'get', pathKey: '/' }, ...frames];
+  return frames;
 }

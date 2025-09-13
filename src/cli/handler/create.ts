@@ -54,6 +54,8 @@ export async function create(params: InferValue<typeof createCommand>): Promise<
     host: params.host,
     output: params.output,
     useCodeFence: params.codeFence ?? false,
+    timeout: params.timeout,
+    baseFrame: params.baseFrame,
   });
   consola.debug(`Frames: ${frames.length}`);
 

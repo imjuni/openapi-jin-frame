@@ -17,6 +17,7 @@ import { removeExt } from '#/modules/safe-tools/removeExt';
 
 interface IProps {
   specTypeFilePath: string;
+  baseFrame?: string;
   output: string;
   host: string;
   pathKey: string;
@@ -78,10 +79,21 @@ export function createFrame(project: Project, params: IProps): IResult {
     ...bodies.map((body) => body.decorator),
   ];
 
-  sourceFile.addImportDeclaration({
-    moduleSpecifier: 'jin-frame',
-    namedImports: [method, ...Array.from(new Set<string>(bodyNamedImports)), 'JinFrame'],
-  });
+  if (params.baseFrame != null) {
+    sourceFile.addImportDeclaration({
+      moduleSpecifier: dotRelative(
+        safePathJoin(params.output, firstTag),
+        safePathJoin(params.output, params.baseFrame),
+      ),
+      namedImports: [params.baseFrame],
+    });
+  } else {
+    sourceFile.addImportDeclaration({
+      moduleSpecifier: 'jin-frame',
+      namedImports: [method, ...Array.from(new Set<string>(bodyNamedImports)), 'JinFrame'],
+    });
+  }
+
   sourceFile.addImportDeclaration({
     moduleSpecifier: dotRelative(
       safePathJoin(params.output, firstTag),
@@ -90,13 +102,15 @@ export function createFrame(project: Project, params: IProps): IResult {
     namedImports: ['paths'],
   });
 
+  const parentFrame = params.baseFrame ?? 'JinFrame';
+
   sourceFile.addClass({
     name,
     docs: [{ description }],
     decorators: [methodDecorator],
     properties,
     isExported: true,
-    extends: `JinFrame<paths['${params.pathKey}']['${originMethod}']['responses']['${responseContentType?.statusCode}']['content']['${responseContentType?.mediaType}']>`,
+    extends: `${parentFrame}<paths['${params.pathKey}']['${originMethod}']['responses']['${responseContentType?.statusCode}']['content']['${responseContentType?.mediaType}']>`,
   });
 
   return {

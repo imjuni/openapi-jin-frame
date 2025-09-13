@@ -14,6 +14,7 @@ import {
   merge,
   withDefault,
   map,
+  integer,
 } from '@optique/core';
 import { path } from '@optique/run';
 
@@ -33,11 +34,10 @@ export const createCommand = command(
           metavar: pathe.join(process.cwd(), 'spec'),
         }),
       ),
-      logLevel: withDefault(
-        optional(option('--log-level', choice(['debug', 'info', 'error']))),
-        'info',
-      ),
+      logLevel: withDefault(option('--log-level', choice(['debug', 'info', 'error'])), 'info'),
       host: option('-h', '--host', string({ metavar: 'https://api.example.com' })),
+      baseFrame: withDefault(option('--base-frame', string({ metavar: 'BaseFrame' })), 'BaseFrame'),
+      timeout: withDefault(option('--timeout', integer({ metavar: '60000' })), 60000),
       codeFence: or(
         map(optional(option('--code-fence')), (value) => value),
         map(optional(option('--no-code-fence')), (value) => !value),

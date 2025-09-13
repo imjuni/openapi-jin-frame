@@ -105,6 +105,7 @@ dist
 
 .wireit
 
+# Project
 .DS_Store
-
 git-short.sh
+spec/

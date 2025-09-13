@@ -10,6 +10,8 @@ describe('createOpenapiTsOption', () => {
       logLevel: 'info',
       host: 'host',
       codeFence: false,
+      baseFrame: 'BaseFrame',
+      timeout: 60000,
 
       'oat-additional-properties': undefined,
       'oat-alphabetize': undefined,

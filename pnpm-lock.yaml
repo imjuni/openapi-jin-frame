@@ -12,11 +12,11 @@ importers:
         specifier: ^14.2.0
         version: 14.2.0(@types/json-schema@7.0.15)
       '@optique/core':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.4.2
+        version: 0.4.2
       '@optique/run':
-        specifier: ^0.4.0
-        version: 0.4.0
+        specifier: ^0.4.2
+        version: 0.4.2
       axios:
         specifier: ^1.11.0
         version: 1.11.0
@@ -524,12 +524,12 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
-  '@optique/core@0.4.0':
-    resolution: {integrity: sha512-UiG5fYluVGwvJx073CqGlkIob4uAhSp1SAY2fPdpD5icGSwf6W1rMqaaFyJD4c0TuSs8w3HGksDwgLMznJDIQg==}
+  '@optique/core@0.4.2':
+    resolution: {integrity: sha512-ZTS+jTsw8fQuHaCZAOeWZuHxn/L/fcxFV6Hzs02fItn4v53MqxdZgvY0Fa/KYDmvE4ZzCm9Lm93bf5tVT32U9Q==}
     engines: {bun: '>=1.2.0', deno: '>=2.3.0', node: '>=20.0.0'}
 
-  '@optique/run@0.4.0':
-    resolution: {integrity: sha512-28fidIwmPweQf5Z6FsbkQ5ooGoQulXptlCtNoavqpOu2B1Xcy88y9Sd2IVigrE0CVsXS1AMJmwNM3KAXICpilQ==}
+  '@optique/run@0.4.2':
+    resolution: {integrity: sha512-QJUczNryFFnNjTOk8BbkYF53APD4FTrOnKg04M2erKyAsV+rBasXLca6bTT1w1B8DSAlWeSZK62XRedEHWecbA==}
     engines: {bun: '>=1.2.0', deno: '>=2.3.0', node: '>=20.0.0'}
 
   '@pkgjs/parseargs@0.11.0':
@@ -3373,11 +3373,11 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.15.0
 
-  '@optique/core@0.4.0': {}
+  '@optique/core@0.4.2': {}
 
-  '@optique/run@0.4.0':
+  '@optique/run@0.4.2':
     dependencies:
-      '@optique/core': 0.4.0
+      '@optique/core': 0.4.2
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

@@ -1,12 +1,13 @@
 import type { Project } from 'ts-morph';
 import { randomUUID } from 'node:crypto';
+import { pascalCase } from 'change-case';
 
 function getBaseFrameJsDoc(timeout?: number): string {
   const defaultTimeout = `Base Frame
 
 In most infrastructures, such as Cloudflare, AWS ALB, and Nginx, 
 the default timeout value is around 60 seconds. The default timeout 
-has been set to around 60 seconds.`;
+has been set to 60 seconds.`;
 
   const withTimeout = `Base Frame
 
@@ -22,6 +23,7 @@ Timeout ${timeout} milliseconds.`;
 interface IProps {
   output: string;
   host: string;
+  name: string;
   timeout?: number;
 }
 
@@ -33,6 +35,7 @@ interface IResult {
 }
 
 export function createBaseFrame(project: Project, params: IProps): IResult {
+  const name = pascalCase(params.name);
   const timeout = params?.timeout ?? 60_000;
   const aliasFilePath = `${randomUUID()}-${randomUUID()}.ts`;
   const sourceFile = project.createSourceFile(aliasFilePath);
@@ -43,7 +46,7 @@ export function createBaseFrame(project: Project, params: IProps): IResult {
   });
 
   sourceFile.addClass({
-    name: 'BaseFrame',
+    name,
     docs: [{ description: getBaseFrameJsDoc(params?.timeout) }],
     typeParameters: [
       {
@@ -73,7 +76,7 @@ export function createBaseFrame(project: Project, params: IProps): IResult {
   });
 
   return {
-    filePath: 'BaseFrame.ts',
+    filePath: `${name}.ts`,
     tag: undefined,
     aliasFilePath,
     source: sourceFile.print(),
