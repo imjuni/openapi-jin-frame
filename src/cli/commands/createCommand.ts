@@ -6,7 +6,6 @@ import {
   command,
   object,
   constant,
-  optional,
   option,
   string,
   choice,
@@ -15,6 +14,7 @@ import {
   withDefault,
   map,
   integer,
+  optional,
 } from '@optique/core';
 import { path } from '@optique/run';
 
@@ -36,11 +36,20 @@ export const createCommand = command(
       ),
       logLevel: withDefault(option('--log-level', choice(['debug', 'info', 'error'])), 'info'),
       host: option('-h', '--host', string({ metavar: 'https://api.example.com' })),
-      baseFrame: withDefault(option('--base-frame', string({ metavar: 'BaseFrame' })), 'BaseFrame'),
-      timeout: withDefault(option('--timeout', integer({ metavar: '60000' })), 60000),
-      codeFence: or(
-        map(optional(option('--code-fence')), (value) => value),
-        map(optional(option('--no-code-fence')), (value) => !value),
+      baseFrame: withDefault(
+        or(
+          option('--base-frame', string({ metavar: 'BaseFrame' })),
+          map(option('--no-base-frame'), () => undefined),
+        ),
+        'BaseFrame',
+      ),
+      timeout: optional(option('--timeout', integer({ metavar: '60000' }))),
+      codeFence: withDefault(
+        or(
+          map(option('--code-fence'), (value) => value),
+          map(option('--no-code-fence'), (value) => !value),
+        ),
+        true,
       ),
     }),
     openapiTypescriptOptions,

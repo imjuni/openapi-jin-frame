@@ -9,7 +9,8 @@ export function getResponseContentType(
     return undefined;
   }
 
-  const statusCodes = Object.keys(responses).filter((statusCode) => statusCode !== '200');
+  const statusCodes = Object.keys(responses);
+  const statusCodesWithout200 = statusCodes.filter((statusCode) => statusCode !== '200');
 
   const successContentCode = getFirstContentType(
     preferredContentTypes,
@@ -20,7 +21,7 @@ export function getResponseContentType(
     return { statusCode: '200', mediaType: successContentCode.mediaType };
   }
 
-  const otherContentTypes = statusCodes
+  const otherContentTypes = statusCodesWithout200
     .map((statusCode) => {
       const first = getFirstContentType(
         preferredContentTypes,
@@ -37,6 +38,10 @@ export function getResponseContentType(
       return undefined;
     })
     .filter((contentType) => contentType != null);
+
+  if (otherContentTypes.length <= 0 && statusCodes.includes('200')) {
+    return { statusCode: '200', mediaType: '' };
+  }
 
   const firstContentType = otherContentTypes.at(0);
   return firstContentType;

@@ -14,6 +14,7 @@ import { getMethodDecorator } from '#/modules/generators/content-type/getMethodD
 import { dotRelative } from '#/modules/safe-tools/dotRelative';
 import { safePathJoin } from '#/modules/safe-tools/safePathJoin';
 import { removeExt } from '#/modules/safe-tools/removeExt';
+import { getResponeTypeMappedAccessPath } from '#/modules/generators/content-type/getResponeTypeMappedAccessPath';
 
 interface IProps {
   specTypeFilePath: string;
@@ -34,7 +35,11 @@ interface IResult {
 
 export function createFrame(project: Project, params: IProps): IResult {
   const aliasFilePath = `${randomUUID()}-${randomUUID()}.ts`;
-  const name = getFrameName(params);
+  const name = getFrameName({
+    pathKey: params.pathKey,
+    method: params.method,
+    operationId: params.operation?.operationId,
+  });
   const filePath = `${name}.ts`;
   const sourceFile = project.createSourceFile(aliasFilePath);
   const originMethod = params.method.toLowerCase();
@@ -46,6 +51,7 @@ export function createFrame(project: Project, params: IProps): IResult {
   const methodDecorator = getMethodDecorator({
     host: params.host,
     path: pathToRegex,
+    baseFrame: params.baseFrame,
     method,
     contentType: requestContentType,
   });
@@ -81,6 +87,10 @@ export function createFrame(project: Project, params: IProps): IResult {
 
   if (params.baseFrame != null) {
     sourceFile.addImportDeclaration({
+      moduleSpecifier: 'jin-frame',
+      namedImports: [method, ...Array.from(new Set<string>(bodyNamedImports))],
+    });
+    sourceFile.addImportDeclaration({
       moduleSpecifier: dotRelative(
         safePathJoin(params.output, firstTag),
         safePathJoin(params.output, params.baseFrame),
@@ -104,13 +114,19 @@ export function createFrame(project: Project, params: IProps): IResult {
 
   const parentFrame = params.baseFrame ?? 'JinFrame';
 
+  const responeTypeMappedAccessPath = getResponeTypeMappedAccessPath({
+    method: originMethod,
+    pathKey: params.pathKey,
+    responseContentType,
+  });
+
   sourceFile.addClass({
     name,
     docs: [{ description }],
     decorators: [methodDecorator],
     properties,
     isExported: true,
-    extends: `${parentFrame}<paths['${params.pathKey}']['${originMethod}']['responses']['${responseContentType?.statusCode}']['content']['${responseContentType?.mediaType}']>`,
+    extends: `${parentFrame}<paths${responeTypeMappedAccessPath}>`,
   });
 
   return {

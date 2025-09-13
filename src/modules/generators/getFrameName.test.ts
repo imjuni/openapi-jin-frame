@@ -9,7 +9,7 @@ describe('getFrameName', () => {
       pathKey: '/pet/findByTags',
     });
 
-    expect(result).toEqual('findPetsByTags');
+    expect(result).toEqual('FindPetsByTagsFrame');
   });
 
   it('should return method with pathKey when nullable operationId', () => {

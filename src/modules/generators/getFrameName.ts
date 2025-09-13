@@ -9,7 +9,7 @@ interface IProps {
 
 export function getFrameName(params: IProps): string {
   if (params.operationId != null) {
-    return params.operationId;
+    return pascalCase(`${params.operationId}_Frame`);
   }
 
   const frame = pascalCase(snakeCase(`${params.method}_${params.pathKey.replace('/', '_')}_frame`));

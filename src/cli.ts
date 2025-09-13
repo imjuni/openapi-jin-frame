@@ -1,6 +1,3 @@
-// import { convertor } from '#/modules/openapi/convertor';
-// import { load } from '#/modules/openapi/load';
-// import { validate } from '#/modules/openapi/validate';
 import log from 'consola';
 import { isError } from 'my-easy-fp';
 import { install as sourceMapSupportInstall } from 'source-map-support';
